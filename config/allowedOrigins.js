@@ -1,5 +1,5 @@
 const allowedOrigins = [
-    'https://my-projectfront.vercel.app'
+  'https://myprojectback-production.up.railway.app/'
 ]
 
 module.exports = allowedOrigins
