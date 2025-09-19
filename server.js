@@ -28,6 +28,17 @@ app.use((req, res, next) => {
     next()
 })
 
+// ------------------ HEALTH CHECK ROUTE ------------------
+// Add this before other routes for Railway health checks
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV
+    })
+})
+
 // ------------------ ROUTES ------------------
 
 // Serve static files
@@ -54,10 +65,24 @@ app.all('*', (req, res) => {
 // Global error handler
 app.use(errorHandler)
 
+// ------------------ PROCESS HANDLERS ------------------
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully')
+    process.exit(0)
+})
+
+process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully')
+    process.exit(0)
+})
+
 // ------------------ START SERVER ------------------
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB')
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+    // Add host binding for Railway
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`)
+    })
 })
 
 mongoose.connection.on('error', err => {
