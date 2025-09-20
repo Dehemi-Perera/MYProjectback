@@ -32,10 +32,11 @@ app.use((req, res, next) => {
 // Add this before other routes for Railway health checks
 app.get('/health', (req, res) => {
     res.status(200).json({ 
-        status: 'OK', 
+        status: 'OK',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
-        environment: process.env.NODE_ENV
+        environment: process.env.NODE_ENV,
+        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
     })
 })
 
